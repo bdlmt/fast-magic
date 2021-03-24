@@ -24,6 +24,14 @@ fn main() {
             .long("regex")
             .takes_value(true)
             .help("Regex pattern to match"))
+        .arg(Arg::with_name("symlinks")
+            .short("s")
+            .long("symlinks")
+            .help("Follow symlinks"))
+        .arg(Arg::with_name("magic")
+            .short("m")
+            .long("magic")
+            .help("Path to magic database file"))
         .get_matches();
 
     // Build a vector of grouped filepaths by walking the target directory.
@@ -33,10 +41,16 @@ fn main() {
         filepath_groups.push(vec![])
     }
     let dirpath = matches.value_of("directory").unwrap_or(".");
-    for entry in WalkDir::new(dirpath).follow_links(true) {
-        filepath_groups[n_jobs%n_workers].push(entry.expect("Failed to get WalkDir entry.").path().display().to_string());
-        n_jobs += 1; // each filepath discovered will be a job
+    for entry in WalkDir::new(dirpath).follow_links(matches.is_present("symlinks")) {
+        let direntry = entry.expect("Failed to get WalkDir entry.");
+        if direntry.file_type().is_file() {
+           filepath_groups[n_jobs%n_workers].push(direntry.path().display().to_string());
+            n_jobs += 1; // each filepath discovered will be a job
+        }
     }
+
+    // Defaulting to Ubuntu's magic database file location
+    let magic_path = matches.value_of("magic").unwrap_or("/usr/share/misc/magic.mgc").to_string();
 
     // Create a pool of threads to check each filepath using libmagic
     // Each thread will create a magic cookie to scan each filepath in the group handed to it
@@ -45,9 +59,10 @@ fn main() {
     for group in filepath_groups {
         let tx = tx.clone();
         let filepaths = group.clone();
+        let magic_db = magic_path.clone();
         pool.execute(move|| {
             let cookie = Cookie::open(CookieFlags::default()).unwrap();
-            let databases = vec!["/usr/share/misc/magic.mgc"];
+            let databases = vec![magic_db];
             assert!(cookie.load(&databases).is_ok());
             for filepath in filepaths {
                 let filetype = cookie.file(&filepath).expect("Failed to scan file using libmagic.");
