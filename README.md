@@ -8,12 +8,15 @@ A regex pattern is used to return only matching file types. By default, it will 
 # Usage
 <pre>
 USAGE:
-    fast-magic [OPTIONS]
+    fast-magic [FLAGS] [OPTIONS]
 
 FLAGS:
-    -h, --help       Prints help information
+    -h, --help        Prints help information
+    -s, --symlinks    Follow symlinks
+    -V, --version     Prints version information
 
 OPTIONS:
     -d, --directory <directory>    Directory to walk
+    -m, --magic <magic>            Path to magic database file
     -r, --regex <regex>            Regex pattern to match
 </pre>
