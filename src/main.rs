@@ -31,6 +31,7 @@ fn main() {
         .arg(Arg::with_name("magic")
             .short("m")
             .long("magic")
+            .takes_value(true)
             .help("Path to magic database file"))
         .get_matches();
 
