@@ -8,12 +8,13 @@ use regex::Regex;
 fn main() {
 
     let n_workers = num_cpus::get(); // each logical core will run a worker
+    //let n_workers = 1; // each logical core will run a worker
     let mut n_jobs = 0; // this will be incremented
 
     // Parse command arguments
     let matches = App::new("fast-magic")
-        .author("https://github.com/bdlmt/fast-magic")
-        .about("Concurrent file search, using libmagic and regex.")
+        //.author("https://github.com/bdlmt/fast-magic")
+        .about("Concurrent file type search, using libmagic and regex.")
         .arg(Arg::with_name("directory")
             .short("d")
             .long("directory")
@@ -23,7 +24,7 @@ fn main() {
             .short("r")
             .long("regex")
             .takes_value(true)
-            .help("Regex pattern to match"))
+            .help("Regex pattern to match for filetype"))
         .arg(Arg::with_name("symlinks")
             .short("s")
             .long("symlinks")
