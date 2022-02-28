@@ -33,7 +33,7 @@ fn main() {
             .short("m")
             .long("magic")
             .takes_value(true)
-            .help("Path to magic database file"))
+            .help("Path to magic database file (default: /usr/share/misc/magic.mgc"))
         .get_matches();
 
     // Build a vector of grouped filepaths by walking the target directory.
